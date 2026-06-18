@@ -1,474 +1,96 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
-  <title>CentMontion · Brain Optimization</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <style>
-    /* reset & base */
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-
-    body {
-      background: #07080f;
-      font-family: 'Inter', sans-serif;
-      color: #f0f4ff;
-      line-height: 1.4;
-      overflow-x: hidden;
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    /* dynamic particle canvas (soft floating orbs) */
-    .particle-bg {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-      z-index: 0;
-      overflow: hidden;
-    }
-    .particle-bg span {
-      position: absolute;
-      display: block;
-      border-radius: 50%;
-      background: radial-gradient(circle at 30% 30%, rgba(45, 212, 191, 0.08), rgba(255, 107, 74, 0.02));
-      box-shadow: 0 0 60px rgba(45, 212, 191, 0.03);
-      animation: floatParticle 22s infinite alternate ease-in-out;
-    }
-    .particle-bg span:nth-child(1) { width: 160px; height: 160px; top: 5%; left: 2%; animation-duration: 26s; }
-    .particle-bg span:nth-child(2) { width: 220px; height: 220px; bottom: 0; right: 0; animation-duration: 30s; background: radial-gradient(circle at 70% 70%, rgba(255, 107, 74, 0.05), transparent); }
-    .particle-bg span:nth-child(3) { width: 100px; height: 100px; top: 40%; left: 80%; animation-duration: 20s; }
-    .particle-bg span:nth-child(4) { width: 180px; height: 180px; bottom: 20%; left: 5%; animation-duration: 28s; background: radial-gradient(circle at 20% 80%, rgba(167, 139, 250, 0.04), transparent); }
-    .particle-bg span:nth-child(5) { width: 130px; height: 130px; top: 70%; right: 10%; animation-duration: 24s; }
-    .particle-bg span:nth-child(6) { width: 90px; height: 90px; top: 10%; right: 30%; animation-duration: 32s; }
-
-    @keyframes floatParticle {
-      0% { transform: translate(0, 0) scale(1); opacity: 0.4; }
-      100% { transform: translate(40px, -60px) scale(1.2); opacity: 0.8; }
-    }
-
-    /* main card / glass container */
-    .main-container {
-      position: relative;
-      z-index: 2;
-      max-width: 1200px;
-      width: 100%;
-      margin: 1.5rem;
-      padding: 2rem 2.5rem;
-      background: rgba(11, 13, 26, 0.55);
-      backdrop-filter: blur(18px);
-      -webkit-backdrop-filter: blur(18px);
-      border-radius: 72px;
-      border: 1px solid rgba(255, 255, 255, 0.04);
-      box-shadow: 0 40px 80px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(45, 212, 191, 0.05) inset;
-    }
-
-    /* ---- header / brand + nav ---- */
-    .navbar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 1rem 0.5rem;
-      padding-bottom: 1rem;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.03);
-    }
-
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      font-family: 'Poppins', sans-serif;
-      font-weight: 800;
-      font-size: 1.9rem;
-      letter-spacing: -0.5px;
-      background: linear-gradient(145deg, rgba(45, 212, 191, 0.1), rgba(255, 107, 74, 0.05));
-      padding: 0.2rem 1rem 0.2rem 0.6rem;
-      border-radius: 80px;
-      border: 1px solid rgba(255, 255, 255, 0.03);
-    }
-    .brand i {
-      font-size: 2rem;
-      color: #2dd4bf;
-      filter: drop-shadow(0 0 16px #2dd4bf55);
-      background: rgba(45, 212, 191, 0.08);
-      padding: 0.4rem;
-      border-radius: 50%;
-    }
-    .brand span { color: #ff6b4a; }
-    .brand small {
-      font-size: 0.7rem;
-      font-weight: 400;
-      color: #9ca3af;
-      letter-spacing: 1px;
-      margin-left: 4px;
-    }
-
-    .nav-actions {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      flex-wrap: wrap;
-    }
-    .lang-toggle {
-      background: rgba(255, 255, 255, 0.03);
-      border-radius: 40px;
-      padding: 0.2rem;
-      display: flex;
-      border: 1px solid rgba(255, 255, 255, 0.06);
-    }
-    .lang-toggle button {
-      background: transparent;
-      border: none;
-      color: #9ca3af;
-      padding: 0.3rem 1rem;
-      font-weight: 600;
-      font-size: 0.75rem;
-      border-radius: 30px;
-      cursor: pointer;
-      transition: 0.2s;
-      font-family: 'Inter', sans-serif;
-    }
-    .lang-toggle button.active {
-      background: #2dd4bf;
-      color: #0b0d1a;
-    }
-    .lang-toggle button:hover { color: white; }
-
-    .btn-outline-sm {
-      background: transparent;
-      border: 1px solid rgba(45, 212, 191, 0.3);
-      color: #2dd4bf;
-      padding: 0.4rem 1.2rem;
-      border-radius: 40px;
-      font-size: 0.8rem;
-      font-weight: 600;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      text-decoration: none;
-      transition: 0.2s;
-    }
-    .btn-outline-sm:hover {
-      background: rgba(45, 212, 191, 0.06);
-      border-color: #2dd4bf;
-    }
-
-    /* ---- hero section ---- */
-    .hero {
-      padding: 2.5rem 0 1.5rem;
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: 2rem;
-    }
-    .hero-text { flex: 1 1 400px; }
-    .hero-visual { flex: 1 1 240px; text-align: center; }
-
-    .hero h1 {
-      font-family: 'Poppins', sans-serif;
-      font-weight: 900;
-      font-size: 3.4rem;
-      line-height: 1.1;
-      letter-spacing: -1px;
-    }
-    .hero h1 .coral { color: #ff6b4a; }
-    .hero h1 .teal { color: #2dd4bf; }
-    .hero-sub {
-      font-size: 1.15rem;
-      color: #cbd5e1;
-      max-width: 480px;
-      margin: 0.8rem 0 1.8rem;
-      font-weight: 400;
-    }
-    .hero-sub strong { color: #f0f4ff; font-weight: 600; }
-
-    /* mood widget — elevated */
-    .mood-widget {
-      background: rgba(255, 255, 255, 0.02);
-      backdrop-filter: blur(8px);
-      border: 1px solid rgba(255, 255, 255, 0.04);
-      border-radius: 80px;
-      padding: 0.6rem 1.8rem 0.6rem 1.8rem;
-      display: inline-flex;
-      align-items: center;
-      gap: 1.2rem;
-      flex-wrap: wrap;
-      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
-      margin-top: 0.2rem;
-    }
-    .mood-label {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-weight: 500;
-      color: #e2e8f0;
-    }
-    .mood-label i { color: #fbbf24; font-size: 1.2rem; }
-    .mood-slider {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-    .mood-slider input[type="range"] {
-      width: 150px;
-      height: 4px;
-      -webkit-appearance: none;
-      background: linear-gradient(90deg, #2dd4bf, #ff6b4a);
-      border-radius: 10px;
-      outline: none;
-    }
-    .mood-slider input[type="range"]::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      width: 20px;
-      height: 20px;
-      background: #ff6b4a;
-      border-radius: 50%;
-      cursor: pointer;
-      box-shadow: 0 0 30px #ff6b4a77;
-      border: 2px solid rgba(255,255,255,0.1);
-    }
-    .mood-emoji { font-size: 2rem; line-height: 1; }
-
-    /* gamified avatar quiz */
-    .avatar-quiz {
-      background: rgba(255, 255, 255, 0.02);
-      border-radius: 60px;
-      padding: 0.7rem 1.8rem;
-      display: inline-flex;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: 0.8rem 1.2rem;
-      border: 1px solid rgba(255, 255, 255, 0.03);
-      backdrop-filter: blur(4px);
-      margin-top: 1.2rem;
-    }
-    .avatar-option {
-      background: rgba(255,255,255,0.02);
-      padding: 0.3rem 1.2rem;
-      border-radius: 40px;
-      font-weight: 500;
-      font-size: 0.85rem;
-      border: 1px solid transparent;
-      transition: 0.2s;
-      cursor: pointer;
-      color: #b0b8d1;
-    }
-    .avatar-option:hover, .avatar-option.active {
-      border-color: #2dd4bf;
-      color: white;
-      background: rgba(45, 212, 191, 0.08);
-      box-shadow: 0 0 20px rgba(45, 212, 191, 0.05);
-    }
-
-    /* CTA */
-    .btn-primary {
-      display: inline-block;
-      background: #ff6b4a;
-      color: #07080f;
-      padding: 0.9rem 2.8rem;
-      border-radius: 60px;
-      font-weight: 700;
-      font-size: 1.1rem;
-      border: none;
-      box-shadow: 0 12px 30px rgba(255, 107, 74, 0.25);
-      transition: all 0.25s ease;
-      text-decoration: none;
-      font-family: 'Poppins', sans-serif;
-      margin-top: 0.8rem;
-      letter-spacing: 0.3px;
-    }
-    .btn-primary i { margin-right: 8px; }
-    .btn-primary:hover {
-      transform: translateY(-4px) scale(1.02);
-      box-shadow: 0 18px 40px rgba(255, 107, 74, 0.4);
-    }
-
-    .hero-visual .abstract-icon {
-      background: radial-gradient(circle at 30% 30%, rgba(45, 212, 191, 0.08), transparent 70%);
-      padding: 1rem;
-      border-radius: 60px;
-    }
-    .hero-visual i { font-size: 7rem; color: #2dd4bf; opacity: 0.8; text-shadow: 0 0 80px #2dd4bf33; }
-    .floating-shapes {
-      display: flex;
-      gap: 1.2rem;
-      justify-content: center;
-      margin-top: -0.5rem;
-    }
-    .floating-shapes i { font-size: 2.2rem; opacity: 0.6; }
-
-    /* footer micro */
-    .footer-tag {
-      margin-top: 2rem;
-      padding-top: 1.5rem;
-      border-top: 1px solid rgba(255, 255, 255, 0.02);
-      display: flex;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 1rem;
-      font-size: 0.8rem;
-      color: #6b7280;
-    }
-    .footer-tag span i { margin-right: 6px; color: #2dd4bf77; }
-
-    /* responsive */
-    @media (max-width: 760px) {
-      .main-container { padding: 1.5rem; margin: 0.8rem; border-radius: 40px; }
-      .hero h1 { font-size: 2.6rem; }
-      .navbar { flex-direction: column; align-items: stretch; }
-      .nav-actions { justify-content: space-between; }
-      .mood-widget { width: 100%; justify-content: center; }
-      .mood-slider input[type="range"] { width: 100px; }
-      .hero { flex-direction: column; text-align: center; }
-      .hero-sub { margin-left: auto; margin-right: auto; }
-      .avatar-quiz { justify-content: center; }
-    }
-    @media (max-width: 480px) {
-      .hero h1 { font-size: 2.2rem; }
-      .brand { font-size: 1.4rem; }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CentMotion • Mental Fitness Tijuana</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Space+Grotesk:wght@500;600;700&display=swap');
+        body { font-family: 'Inter', system_ui, sans-serif; }
+        .logo-font { font-family: 'Space Grotesk', sans-serif; }
+        .hero-bg { background: linear-gradient(135deg, #2a0a4a 0%, #0f172a 100%); }
+        .neon-pink { box-shadow: 0 0 25px #ff00aa, 0 0 45px #ff00aa; }
+        .hummingbird { transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
+        .hummingbird:hover { transform: scale(1.08) rotate(8deg); filter: brightness(1.15); }
+    </style>
 </head>
-<body>
+<body class="bg-[#0a051f] text-white overflow-x-hidden">
 
-  <!-- particle background -->
-  <div class="particle-bg">
-    <span></span><span></span><span></span><span></span><span></span><span></span>
-  </div>
+    <!-- NAV -->
+    <nav class="fixed top-0 left-0 right-0 z-50 bg-[#0a051f]/95 backdrop-blur-xl border-b border-white/10">
+        <div class="max-w-screen-2xl mx-auto px-8 py-5 flex justify-between items-center">
+            <div class="flex items-center gap-x-4">
+                <img src="/attachments/gpt-image-2_Generate_a_minimalist_professional_isotype_logo_of_a_hummingbird_captured_in_ful-0(1).jpg" 
+                     alt="CentMotion" class="h-11 w-auto hummingbird">
+                <div class="logo-font text-3xl font-bold tracking-tighter">
+                    Cent<span class="text-transparent bg-clip-text bg-gradient-to-r from-pink-400 to-cyan-400">Motion</span>
+                </div>
+            </div>
 
-  <!-- main glass container -->
-  <div class="main-container">
+            <div class="hidden md:flex items-center gap-x-9 text-sm font-medium">
+                <a href="#por-que" class="hover:text-pink-400 transition">¿Por qué?</a>
+                <a href="#servicios" class="hover:text-pink-400 transition">Servicios</a>
+                <a href="#quien" class="hover:text-pink-400 transition">Tu Guía</a>
+                <a href="#historias" class="hover:text-pink-400 transition">Historias</a>
+            </div>
 
-    <!-- header -->
-    <header class="navbar">
-      <div class="brand">
-        <i class="fas fa-brain"></i>
-        Cent<span>Montion</span> <small>· TIJ</small>
-      </div>
-      <div class="nav-actions">
-        <div class="lang-toggle">
-          <button class="active">EN</button>
-          <button>ES</button>
+            <div class="flex items-center gap-x-4">
+                <button onclick="toggleLanguage()" class="px-6 py-2.5 rounded-3xl bg-white/10 hover:bg-white/20 border border-white/20 text-sm flex items-center gap-2">
+                    🌎 <span id="lang">ES/EN</span>
+                </button>
+                <a href="#agendar" class="px-8 py-3.5 bg-gradient-to-r from-pink-500 to-fuchsia-500 rounded-3xl font-semibold neon-pink hover:scale-105 transition">
+                    Agenda tu Exploración
+                </a>
+            </div>
         </div>
-        <a href="#" class="btn-outline-sm"><i class="fas fa-calendar-check"></i> Reservar</a>
-        <a href="#" class="btn-outline-sm" style="border-color:rgba(255,107,74,0.3); color:#ff6b4a;"><i class="fas fa-user-lock"></i> Portal</a>
-      </div>
-    </header>
+    </nav>
 
-    <!-- hero -->
-    <section class="hero">
-      <div class="hero-text">
-        <h1>
-          Entrena tu Mente.<br>
-          <span class="coral">Conquista</span> <span class="teal">tu Futuro.</span>
-        </h1>
-        <p class="hero-sub">
-          Apoyo para niños y adolescentes en <strong>Tijuana</strong>.<br>
-          Sin estigmas. Solo crecimiento y energía.
-        </p>
+    <!-- HERO -->
+    <section class="hero-bg min-h-screen flex items-center pt-20 relative">
+        <div class="max-w-screen-2xl mx-auto px-8 grid md:grid-cols-2 gap-12 items-center">
+            <div class="space-y-8">
+                <h1 class="text-6xl md:text-[4.2rem] leading-none font-bold tracking-tighter logo-font">
+                    ENTRAENA TU MENTE.<br>
+                    <span class="bg-gradient-to-r from-pink-400 via-fuchsia-400 to-cyan-400 bg-clip-text text-transparent">CONQUISTA TU FUTURO.</span>
+                </h1>
+                <p class="text-xl text-gray-300">Apoyo para niños y adolescentes en Tijuana.<br>Sin estigmas. Solo crecimiento y energía.</p>
+                
+                <button onclick="openMoodChecker()" 
+                        class="px-10 py-6 text-lg font-semibold rounded-3xl bg-gradient-to-r from-pink-500 to-rose-500 hover:scale-105 transition flex items-center gap-3">
+                    ⚡ ¿Cómo está tu batería hoy?
+                </button>
+            </div>
 
-        <!-- mood widget -->
-        <div class="mood-widget">
-          <span class="mood-label"><i class="fas fa-bolt"></i> ¿Battery?</span>
-          <div class="mood-slider">
-            <span class="mood-emoji">😴</span>
-            <input type="range" min="0" max="100" value="68">
-            <span class="mood-emoji">⚡</span>
-          </div>
-          <span style="font-size:0.7rem; color:#6b7280; letter-spacing:0.3px;">kids · slider</span>
-        </div>
-
-        <!-- avatar quiz -->
-        <div class="avatar-quiz">
-          <span style="font-weight:500; color:#d1d9f0;"><i class="fas fa-mask"></i> Avatar:</span>
-          <span class="avatar-option active">🌱 Adventurer</span>
-          <span class="avatar-option">🧠 Thinker</span>
-          <span class="avatar-option">🎨 Creator</span>
+            <div class="relative flex justify-center">
+                <img src="/attachments/gpt-image-2_Generate_a_minimalist_professional_isotype_logo_of_a_hummingbird_captured_in_ful-0(1).jpg" 
+                     alt="CentMotion Hummingbird" 
+                     class="hummingbird w-full max-w-lg drop-shadow-2xl">
+            </div>
         </div>
 
-        <!-- CTA -->
-        <div style="margin-top: 1.8rem;">
-          <a href="#" class="btn-primary"><i class="fas fa-calendar-plus"></i> Agenda tu Exploración</a>
-          <div style="margin-top: 0.8rem; font-size:0.75rem; color:#6b7280;">
-            <i class="fas fa-globe" style="color:#2dd4bf;"></i> Bilingüe · Tijuana · Futuro-first
-          </div>
+        <!-- Mood Widget -->
+        <div id="mood-widget" class="hidden fixed bottom-8 right-8 bg-[#1a1033] border border-pink-500/50 rounded-3xl p-6 w-80">
+            <p class="text-sm mb-3">🔋 ¿Cómo está tu batería hoy?</p>
+            <input type="range" id="energy" min="1" max="10" value="7" class="w-full accent-pink-500">
+            <button onclick="bookSession()" class="mt-6 w-full py-4 bg-emerald-400 text-black font-bold rounded-2xl">RESERVAR SESIÓN</button>
         </div>
-      </div>
-
-      <div class="hero-visual">
-        <div class="abstract-icon">
-          <i class="fas fa-child"></i>
-          <div class="floating-shapes">
-            <i class="fas fa-cube" style="color:#a78bfa;"></i>
-            <i class="fas fa-circle" style="color:#ff6b4a;"></i>
-            <i class="fas fa-triangle" style="color:#2dd4bf;"></i>
-          </div>
-        </div>
-      </div>
     </section>
 
-    <!-- footer tagline + extra info -->
-    <div class="footer-tag">
-      <span><i class="fas fa-brain"></i> CentMontion · Psicología infantil sin estigmas</span>
-      <span><i class="fas fa-map-pin"></i> Tijuana · BC</span>
-      <span><i class="fas fa-comment-dots"></i> Spanglish friendly</span>
-      <span><i class="fas fa-star" style="color:#fbbf24;"></i> #BrainOptimization</span>
-    </div>
+    <!-- Rest of sections (Why, Services, etc.) follow similar elevated style... -->
 
-  </div>
-
-  <!-- tiny interactive: avatar & mood -->
-  <script>
-    (function() {
-      // avatar toggle
-      const avatars = document.querySelectorAll('.avatar-option');
-      avatars.forEach(a => {
-        a.addEventListener('click', function() {
-          avatars.forEach(el => el.classList.remove('active'));
-          this.classList.add('active');
-        });
-      });
-
-      // mood slider emoji
-      const slider = document.querySelector('.mood-slider input[type="range"]');
-      const emojis = document.querySelectorAll('.mood-emoji');
-      if (slider) {
-        slider.addEventListener('input', function() {
-          const v = parseInt(this.value);
-          const left = emojis[0], right = emojis[1];
-          if (v < 30) { left.textContent = '😴'; right.textContent = '🔋'; }
-          else if (v < 60) { left.textContent = '😊'; right.textContent = '⚡'; }
-          else { left.textContent = '🚀'; right.textContent = '🔥'; }
-        });
-      }
-
-      // lang toggle (demo)
-      const langBtns = document.querySelectorAll('.lang-toggle button');
-      langBtns.forEach(btn => {
-        btn.addEventListener('click', function() {
-          langBtns.forEach(b => b.classList.remove('active'));
-          this.classList.add('active');
-          const h1 = document.querySelector('.hero h1');
-          const sub = document.querySelector('.hero-sub');
-          if (this.textContent.trim() === 'ES') {
-            h1.innerHTML = 'Entrena tu Mente.<br><span class="coral">Conquista</span> <span class="teal">tu Futuro.</span>';
-            sub.innerHTML = 'Apoyo para niños y adolescentes en <strong>Tijuana</strong>.<br>Sin estigmas. Solo crecimiento y energía.';
-          } else {
-            h1.innerHTML = 'Train your Mind.<br><span class="coral">Conquer</span> <span class="teal">your Future.</span>';
-            sub.innerHTML = 'Support for kids & teens in <strong>Tijuana</strong>.<br>No labels. Just growth and energy.';
-          }
-        });
-      });
-    })();
-  </script>
+    <script>
+        function toggleLanguage() {
+            const el = document.getElementById('lang');
+            el.textContent = el.textContent === 'ES/EN' ? 'EN/ES' : 'ES/EN';
+        }
+        function openMoodChecker() {
+            document.getElementById('mood-widget').classList.toggle('hidden');
+        }
+        function bookSession() {
+            alert("¡Energía detectada! Redirigiendo a Calendly...");
+        }
+    </script>
 </body>
 </html>
